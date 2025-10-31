@@ -1,91 +1,195 @@
-@import 'tailwindcss';
-@import '../../vendor/livewire/flux/dist/flux.css';
-/* @import './theme.css'; */
+/* Layer 1: Impor Fundamental */
+@import "tailwindcss";
+@import "../../vendor/livewire/flux/dist/flux.css";
+@import "./theme.css"; /* Impor library utility kustom kita */
 
-
+/* Layer 2: Konfigurasi JIT (Just-in-Time) */
 @source '../views/welcome.blade.php';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../vendor/livewire/flux-pro/stubs/**/*.blade.php';
 @source '../../vendor/livewire/flux/stubs/**/*.blade.php';
 
+/* Layer 3: Definisi Varian */
 @custom-variant dark (&:where(.dark, .dark *));
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
 
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
+/*
+|--------------------------------------------------------------------------
+| Layer 4: Konfigurasi Tema (@theme)
+|--------------------------------------------------------------------------
+|
+| SEMUA konfigurasi dari tailwind.config.js lama telah
+| diterjemahkan ke sintaks Variabel CSS yang benar di sini.
+|
+*/
+@theme {
+    /* Font Families */
+    --font-sans: "Inter", "ui-sans-serif", "system-ui", "sans-serif";
+    --font-display: "Manrope", "ui-sans-serif", "system-ui", "sans-serif";
+
+    /* Palet Warna: Primary (Orange) */
+    --color-primary-50: #fff7ed;
+    --color-primary-100: #ffedd5;
+    --color-primary-200: #fed7aa;
+    --color-primary-300: #fdba74;
+    --color-primary-400: #fb923c;
+    --color-primary-500: #f97316;
+    --color-primary-600: #ea580c;
+    --color-primary-700: #c2410c;
+    --color-primary-800: #9a3412;
+    --color-primary-900: #7c2d12;
+    --color-primary-950: #431407;
+    --color-primary: var(--color-primary-500);
+
+    /* Palet Warna: Neutral (Gray) */
+    --color-neutral-50: #fafafa;
+    --color-neutral-100: #f5f5f5;
+    --color-neutral-200: #e5e5e5;
+    --color-neutral-300: #d4d4d4;
+    --color-neutral-400: #a3a3a3;
+    --color-neutral-500: #737373;
+    --color-neutral-600: #525252;
+    --color-neutral-700: #404040;
+    --color-neutral-800: #262626;
+    --color-neutral-900: #171717;
+    --color-neutral-950: #0a0a0a;
+    --color-neutral: var(--color-neutral-500);
+
+    /* Palet Warna: Info */
+    --color-info-50: #eff6ff;
+    --color-info-100: #dbeafe;
+    --color-info-200: #bfdbfe;
+    --color-info-300: #93c5fd;
+    --color-info-400: #60a5fa;
+    --color-info-500: #3b82f6;
+    --color-info-600: #2563eb;
+    --color-info-700: #1d4ed8;
+    --color-info-800: #1e40af;
+    --color-info-900: #1e3a8a;
+    --color-info-950: #172554;
+    --color-info: var(--color-info-500);
+
+    /* Palet Warna: Success */
+    --color-success-50: #f0fdf4;
+    --color-success-100: #dcfce7;
+    --color-success-200: #bbf7d0;
+    --color-success-300: #86efac;
+    --color-success-400: #4ade80;
+    --color-success-500: #22c55e;
+    --color-success-600: #16a34a;
+    --color-success-700: #15803d;
+    --color-success-800: #166534;
+    --color-success-900: #14532d;
+    --color-success-950: #052e16;
+    --color-success: var(--color-success-500);
+
+    /* Palet Warna: Warning */
+    --color-warning-50: #fefce8;
+    --color-warning-100: #fef9c3;
+    --color-warning-200: #fef08a;
+    --color-warning-300: #fde047;
+    --color-warning-400: #facc15;
+    --color-warning-500: #eab308;
+    --color-warning-600: #ca8a04;
+    --color-warning-700: #a16207;
+    --color-warning-800: #854d0e;
+    --color-warning-900: #713f12;
+    --color-warning-950: #422006;
+    --color-warning: var(--color-warning-500);
+
+    /* Palet Warna: Danger */
+    --color-danger-50: #fef2f2;
+    --color-danger-100: #fee2e2;
+    --color-danger-200: #fecaca;
+    --color-danger-300: #fca5a5;
+    --color-danger-400: #f87171;
+    --color-danger-500: #ef4444;
+    --color-danger-600: #dc2626;
+    --color-danger-700: #b91c1c;
+    --color-danger-800: #991b1b;
+    --color-danger-900: #7f1d1d;
+    --color-danger-950: #450a0a;
+    --color-danger: var(--color-danger-500);
+
+    /* Konfigurasi Animasi */
+    --animation-marquee: marquee 30s linear infinite;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Layer 5: Base Styles (@layer base)
+|--------------------------------------------------------------------------
+|
+| Gabungan semua style dasar, tipografi, dan keyframes.
+|
 */
 @layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
-  }
-}
-
-body {
-  @apply font-poppins bg-white text-accent antialiased;
-}
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-  --color-primary: #ff2b2b;
-  --color-accent: #000000;
-
-  --font-poppins: Poppins, sans-serif;
-    --color-zinc-50: #fafafa;
-    --color-zinc-100: #f5f5f5;
-    --color-zinc-200: #e5e5e5;
-    --color-zinc-300: #d4d4d4;
-    --color-zinc-400: #a3a3a3;
-    --color-zinc-500: #737373;
-    --color-zinc-600: #525252;
-    --color-zinc-700: #404040;
-    --color-zinc-800: #262626;
-    --color-zinc-900: #171717;
-    --color-zinc-950: #0a0a0a;
-
-    --color-accent: var(--color-neutral-800);
-    --color-accent-content: var(--color-neutral-800);
-    --color-accent-foreground: var(--color-white);
-}
-
-@layer theme {
-    .dark {
-        --color-accent: var(--color-white);
-        --color-accent-content: var(--color-white);
-        --color-accent-foreground: var(--color-neutral-800);
-    }
-}
-
-@layer base {
-
+    /* Kompatibilitas Border v3 -> v4 */
     *,
     ::after,
     ::before,
     ::backdrop,
     ::file-selector-button {
-        border-color: var(--color-gray-200, currentColor);
+        /* Menggunakan warna neutral-200 dari tema baru kita */
+        border-color: var(--color-neutral-200, currentcolor);
+    }
+
+    /* Style Body Dasar (Light Mode) */
+    body {
+        @apply font-sans bg-white text-neutral-800 transition-colors duration-300;
+    }
+
+    /* Style Body (Dark Mode) */
+    .dark body {
+        @apply bg-neutral-900 text-neutral-300;
+    }
+
+    /* Style Heading Dasar */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        @apply font-display font-bold;
+    }
+
+    /* Definisi Keyframes */
+    @keyframes marquee {
+        0% {
+            transform: translateX(0%);
+        }
+        100% {
+            transform: translateX(-50%);
+        }
     }
 }
+
+/*
+|--------------------------------------------------------------------------
+| Layer 6: Kustomisasi Komponen (Flux UI)
+|--------------------------------------------------------------------------
+|
+| Perbaikan dan override spesifik untuk library pihak ketiga.
+|
+*/
 
 [data-flux-field]:not(ui-radio, ui-checkbox) {
     @apply grid gap-2;
 }
 
 [data-flux-label] {
-    @apply  !mb-0 !leading-tight;
+    @apply !mb-0 !leading-tight;
 }
 
+/*
+ * PERBAIKAN:
+ * Mengganti 'ring-accent' yang lama dengan 'ring-primary-500'
+ * dari tema terpadu kita.
+ * Menambahkan offset ring yang benar untuk light/dark mode.
+ */
 input:focus[data-flux-control],
 textarea:focus[data-flux-control],
 select:focus[data-flux-control] {
-    @apply outline-hidden ring-2 ring-accent ring-offset-2 ring-offset-accent-foreground;
+    @apply outline-hidden ring-2 ring-primary-500 ring-offset-2 ring-offset-white
+           dark:ring-offset-neutral-900;
 }
-
-/* \[:where(&)\]:size-4 {
-    @apply size-4;
-} */
