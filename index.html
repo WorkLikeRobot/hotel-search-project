@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" :class="{ 'dark': darkMode }"
+    x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stay - Find Your Best Place</title>
+
+    <!-- Link to compiled Tailwind CSS -->
+    <link href="./dist/output.css" rel="stylesheet">
+
+    <!-- Import Alpine.js -->
+    <script src="//unpkg.com/alpinejs@3.14.1" defer></script>
+
+    <!-- Import Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* Simple fade-in animation for modal */
+        [x-cloak] {
+            display: none !important;
+        }
+
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: opacity 0.3s ease;
+        }
+
+        .fade-enter-from,
+        .fade-leave-to {
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body class="antialiased">
+
+    <!-- 
+    App-level Alpine.js data store
+    - 'mobileMenuOpen' for the hamburger menu
+    - 'userMenuOpen' for the user avatar dropdown
+    - 'videoModalOpen' for the "Watch Video" modal
+  -->
+    <div x-data="{ mobileMenuOpen: false, userMenuOpen: false, videoModalOpen: false }">
+
+        <!-- ========== HEADER ========== -->
+        <header class="absolute top-0 left-0 w-full z-50 py-6">
+            <nav class="container flex items-center justify-between">
+                <!-- Logo -->
+                <a href="#" class="text-3xl font-extrabold text-slate-900 dark:text-white">
+                    Stay
+                </a>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden lg:flex items-center space-x-8">
+                    <a href="#"
+                        class="font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary-light">Home</a>
+                    <a href="#"
+                        class="font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary-light">App</a>
+                    <a href="#"
+                        class="font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary-light">Recommendation</a>
+                    <a href="#"
+                        class="font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary-light">About
+                        Us</a>
+                </div>
+
+                <!-- Right side: Icons & User Menu -->
+                <div class="flex items-center space-x-4">
+                    <!-- Dark Mode Toggle -->
+                    <button @click="darkMode = !darkMode"
+                        class="p-2 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-brand-dark-light focus:outline-hidden focus:ring-2 focus:ring-primary"
+                        aria-label="Toggle dark mode">
+                        <!-- Sun Icon (Light Mode) -->
+                        <svg x-show="!darkMode" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                            </path>
+                        </svg>
+                        <!-- Moon Icon (Dark Mode) -->
+                        <svg x-show="darkMode" x-cloak class="w-6 h-6" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z">
+                            </path>
+                        </svg>
+                    </button>
+
+                    <!-- User Avatar Dropdown -->
+                    <div class="relative">
+                        <button @click="userMenuOpen = !userMenuOpen"
+                            class="block w-10 h-10 rounded-full overflow-hidden border-2 border-primary focus:outline-hidden focus:ring-2 focus:ring-primary focus:ring-offset-2">
+                            <img src="https://placehold.co/40x40/F97316/FFFFFF?text=A" alt="User Avatar"
+                                class="w-full h-full object-cover">
+                        </button>
+
+                        <!-- Dropdown Menu -->
+                        <div x-show="userMenuOpen" @click.outside="userMenuOpen = false"
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100"
+                            x-transition:leave-end="transform opacity-0 scale-95"
+                            class="absolute right-0 mt-2 w-48 bg-white dark:bg-brand-dark-light rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-50"
+                            x-cloak>
+                            <a href="#"
+                                class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-brand-dark">Profile</a>
+                            <a href="#"
+                                class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-brand-dark">Bookings</a>
+                            <a href="#"
+                                class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-brand-dark">Sign
+                                Out</a>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Menu Toggle -->
+                    <button @click="mobileMenuOpen = !mobileMenuOpen"
+                        class="lg:hidden p-2 rounded-md text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-brand-dark-light"
+                        aria-label="Toggle mobile menu">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Mobile Menu Panel -->
+            <div x-show="mobileMenuOpen" x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0 transform -translate-y-4"
+                x-transition:enter-end="opacity-100 transform translate-y-0"
+                x-transition:leave="transition ease-in duration-150"
+                x-transition:leave-start="opacity-100 transform translate-y-0"
+                x-transition:leave-end="opacity-0 transform -translate-y-4"
+                class="lg:hidden absolute top-full left-0 w-full bg-white dark:bg-brand-dark shadow-lg rounded-b-lg p-5 z-40"
+                x-cloak>
+                <div class="flex flex-col space-y-4">
+                    <a href="#"
+                        class="block font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary-light">Home</a>
+                    <a href="#"
+                        class="block font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary-light">App</a>
+                    <a href="#"
+                        class="block font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary-light">Recommendation</a>
+                    <a href="#"
+                        class="block font-medium text-slate-700 dark:text-slate-300 hover:text-primary dark:hover:text-primary-light">About
+                        Us</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- ========== MAIN CONTENT ========== -->
+        <main>
+
+            <!-- 1. Hero Section -->
+            <section class="relative pt-32 pb-16 lg:pt-48 lg:pb-24 overflow-hidden">
+                <div class="container">
+                    <div class="grid lg:grid-cols-2 gap-12 items-center">
+                        <!-- Hero Text Content -->
+                        <div class="text-center lg:text-left">
+                            <h1 class="font-extrabold text-slate-900 dark:text-white">
+                                Find the best place to rest
+                            </h1>
+                            <p class="mt-6 text-lg text-slate-600 dark:text-slate-300">
+                                There are many comfortable places for a sign of rest. Through this application you will
+                                find a comfortable place for you to rest and relax.
+                            </p>
+                            <div class="mt-10 flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+                                <a href="#" class="btn btn-primary shadow-lg">
+                                    Search Hotel
+                                </a>
+                                <button @click="videoModalOpen = true" class="btn btn-outline">
+                                    Watch Video
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Hero Image Grid -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-1 gap-4">
+                                <img src="https://placehold.co/300x400/0F172A/FFFFFF?text=Hotel+1"
+                                    alt="Modern hotel exterior" class="w-full h-full object-cover rounded-xl shadow-lg">
+                                <img src="https://placehold.co/300x250/0F172A/FFFFFF?text=Hotel+2"
+                                    alt="Hotel building facade" class="w-full h-full object-cover rounded-xl shadow-lg">
+                            </div>
+                            <div class="grid grid-cols-1 gap-4 mt-8">
+                                <img src="https://placehold.co/300x250/0F172A/FFFFFF?text=Hotel+3" alt="Hotel at night"
+                                    class="w-full h-full object-cover rounded-xl shadow-lg">
+                                <img src="https://placehold.co/300x400/0F172A/FFFFFF?text=Hotel+4"
+                                    alt="Luxury hotel residence"
+                                    class="w-full h-full object-cover rounded-xl shadow-lg">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Floating Testimonial Section -->
+            <section class="section-padding relative">
+                <div class="container">
+                    <div class="grid lg:grid-cols-2 gap-12 items-center">
+                        <!-- Background Image -->
+                        <div class="relative lg:col-start-2">
+                            <img src="https://placehold.co/600x700/0F172A/FFFFFF?text=Hotel+View"
+                                alt="View of a modern high-rise hotel"
+                                class="w-full h-full object-cover rounded-2xl shadow-2xl">
+
+                            <!-- Floating Testimonial Card -->
+                            <div class="testimonial-card absolute -bottom-12 -left-4 sm:-left-12 max-w-xs">
+                                <div class="flex items-center space-x-3">
+                                    <img src="https://placehold.co/40x40/334155/FFFFFF?text=MJ" alt="Michael Jordan"
+                                        class="w-10 h-10 rounded-full">
+                                    <div>
+                                        <div class="font-bold text-slate-900 dark:text-white">Michael Jordan</div>
+                                        <div class="text-sm text-slate-500 dark:text-slate-400">Traveler</div>
+                                    </div>
+                                </div>
+                                <p class="mt-4 text-sm text-slate-600 dark:text-slate-300">
+                                    "This site really helps me in finding a place to rest when I'm traveling too"
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Empty space for balance on desktop -->
+                        <div class="lg:row-start-1">
+                            <!-- This div is intentionally left blank to push the image to the right -->
+                            <!-- On mobile, it stacks naturally -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Feature Section (Dark) -->
+            <section class="section-padding bg-brand-dark text-white mt-12 lg:mt-24">
+                <div class="container">
+                    <div class="grid lg:grid-cols-2 gap-12 items-center">
+                        <!-- Text Content -->
+                        <div>
+                            <h2 class="text-white">Looking for cheap luxury hotels</h2>
+                            <p class="mt-6 text-lg text-slate-300">
+                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+                                dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                                </Ea>
+                            <div class="mt-10">
+                                <a href="#" class="btn btn-primary shadow-lg">
+                                    Learn More
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Empty space for balance -->
+                        <div>
+                            <!-- This div could hold an image or be left blank per the design -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Good Reviews Section -->
+            <section class="section-padding relative bg-slate-50 dark:bg-brand-dark-dark">
+                <!-- Floating shape -->
+                <div class="absolute top-0 left-0 w-full h-72 bg-white dark:bg-brand-dark -skew-y-3 transform-gpu">
+                </div>
+
+                <div class="container relative z-10">
+                    <h2 class="text-center max-w-2xl mx-auto">
+                        Good reviews from some of our users
+                    </h2>
+
+                    <div class="mt-16 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <!-- Review 1 -->
+                        <div class="testimonial-card">
+                            <div class="flex items-center space-x-3">
+                                <img src="https://placehold.co/40x40/334155/FFFFFF?text=MJ" alt="Michael Jordan"
+                                    class="w-10 h-10 rounded-full">
+                                <div>
+                                    <div class="font-bold text-slate-900 dark:text-white">Michael Jordan</div>
+                                    <div class="text-sm text-slate-500 dark:text-slate-400">Traveler</div>
+                                </div>
+                            </div>
+                            <p class="mt-4 text-slate-600 dark:text-slate-300">
+                                "This site really helps me in finding a place to rest when I'm traveling too"
+                            </p>
+                        </div>
+
+                        <!-- Review 2 (Dark card) -->
+                        <div
+                            class="testimonial-card bg-brand-dark text-white dark:bg-brand-dark-light dark:text-white lg:scale-105">
+                            <div class="flex items-center space-x-3">
+                                <img src="https://placehold.co/40x40/F97316/FFFFFF?text=K" alt="Kike"
+                                    class="w-10 h-10 rounded-full">
+                                <div>
+                                    <div class="font-bold text-white">Kike</div>
+                                    <div class="text-sm text-slate-400">Designer</div>
+                                </div>
+                            </div>
+                            <p class="mt-4 text-slate-300">
+                                "very cute and very reliable"
+                            </p>
+                        </div>
+
+                        <!-- Review 3 -->
+                        <div class="testimonial-card">
+                            <div class="flex items-center space-x-3">
+                                <img src="https://placehold.co/40x40/334155/FFFFFF?text=J" alt="James"
+                                    class="w-10 h-10 rounded-full">
+                                <div>
+                                    <div class="font-bold text-slate-900 dark:text-white">James</div>
+                                    <div class="text-sm text-slate-500 dark:text-slate-400">Photographer</div>
+                                </div>
+                            </div>
+                            <p class="mt-4 text-slate-600 dark:text-slate-300">
+                                "provides luxury hotels and comfortable resting places"
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Hotel Listings Section -->
+            <section class="section-padding">
+                <div class="container">
+                    <h2 class="text-center max-w-2xl mx-auto">
+                        We always provide the best choice for users
+                    </h2>
+
+                    <div class="mt-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                        <!-- Hotel 1 -->
+                        <div class="hotel-card">
+                            <img src="https://placehold.co/400x300/334155/FFFFFF?text=Hotel" alt="Spacious luxury hotel"
+                                class="hotel-card-image">
+                            <div class="hotel-card-content">
+                                <h3 class="hotel-card-title">Spacious luxury hotel</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">245 reviews</p>
+                                <div class="grow"></div>
+                                <div class="hotel-card-footer flex justify-between items-center">
+                                    <div class="hotel-card-price">$ 9.87/night</div>
+                                    <a href="#" class="btn btn-primary btn-sm px-4 py-2 text-sm">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hotel 2 -->
+                        <div class="hotel-card">
+                            <img src="https://placehold.co/400x300/556677/FFFFFF?text=Hotel" alt="Natural cool hotel"
+                                class="hotel-card-image">
+                            <div class="hotel-card-content">
+                                <h3 class="hotel-card-title">Natural cool hotel</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">190 reviews</p>
+                                <div class="grow"></div>
+                                <div class="hotel-card-footer flex justify-between items-center">
+                                    <div class="hotel-card-price">$ 7.87/night</div>
+                                    <a href="#" class="btn btn-primary btn-sm px-4 py-2 text-sm">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hotel 3 -->
+                        <div class="hotel-card">
+                            <img src="https://placehold.co/400x300/778899/FFFFFF?text=Hotel" alt="Mieszkanie plus hotel"
+                                class="hotel-card-image">
+                            <div class="hotel-card-content">
+                                <h3 class="hotel-card-title">Mieszkanie plus hotel</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">320 reviews</p>
+                                <div class="grow"></div>
+                                <div class="hotel-card-footer flex justify-between items-center">
+                                    <div class="hotel-card-price">$ 10.87/night</div>
+                                    <a href="#" class="btn btn-primary btn-sm px-4 py-2 text-sm">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hotel 4 -->
+                        <div class="hotel-card">
+                            <img src="https://placehold.co/400x300/99AABB/FFFFFF?text=Hotel" alt="Trunk hotel"
+                                class="hotel-card-image">
+                            <div class="hotel-card-content">
+                                <h3 class="hotel-card-title">Trunk hotel</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">410 reviews</p>
+                                <div class="grow"></div>
+                                <div class="hotel-card-footer flex justify-between items-center">
+                                    <div class="hotel-card-price">$ 9.87/night</div>
+                                    <a href="#" class="btn btn-primary btn-sm px-4 py-2 text-sm">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hotel 5 -->
+                        <div class="hotel-card">
+                            <img src="https://placehold.co/400x300/BBDDEE/FFFFFF?text=Hotel" alt="Edificio Urca hotel"
+                                class="hotel-card-image">
+                            <div class="hotel-card-content">
+                                <h3 class="hotel-card-title">Edificio Urca hotel</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">295 reviews</p>
+                                <div class="grow"></div>
+                                <div class="hotel-card-footer flex justify-between items-center">
+                                    <div class="hotel-card-price">$ 9.01/night</div>
+                                    <a href="#" class="btn btn-primary btn-sm px-4 py-2 text-sm">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Hotel 6 -->
+                        <div class="hotel-card">
+                            <img src="https://placehold.co/400x300/DDEEFF/FFFFFF?text=Hotel" alt="Bravo hotel"
+                                class="hotel-card-image">
+                            <div class="hotel-card-content">
+                                <h3 class="hotel-card-title">Bravo hotel</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">512 reviews</p>
+                                <div class="grow"></div>
+                                <div class="hotel-card-footer flex justify-between items-center">
+                                    <div class="hotel-card-price">$ 11.32/night</div>
+                                    <a href="#" class="btn btn-primary btn-sm px-4 py-2 text-sm">Read More</a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. CTA Section (Dark) -->
+            <section class="bg-brand-dark text-white rounded-t-3xl lg:rounded-t-[4rem] -mb-1">
+                <div class="container section-padding">
+                    <div class="grid lg:grid-cols-2 gap-12 items-center">
+                        <!-- Text Content -->
+                        <div>
+                            <h2 class="text-white max-w-md">
+                                So, let's find your most comfortable hotel
+                            </h2>
+                            <div class="mt-10">
+                                <a href="#" class="btn btn-primary shadow-lg">
+                                    Find Hotel
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Image -->
+                        <div>
+                            <img src="https://placehold.co/600x400/020617/FFFFFF?text=Hotel+CTA"
+                                alt="Comfortable modern hotel"
+                                class="w-full h-full object-cover rounded-2xl shadow-2xl">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- ========== FOOTER ========== -->
+        <footer class="bg-white dark:bg-brand-dark-dark pt-16 pb-12 border-t border-slate-200 dark:border-slate-800">
+            <div class="container">
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8">
+                    <!-- Logo Column -->
+                    <div class="col-span-2 lg:col-span-1">
+                        <a href="#" class="text-3xl font-extrabold text-slate-900 dark:text-white">
+                            Stay
+                        </a>
+                        <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">
+                            Find your next comfortable place to rest.
+                        </p>
+                    </div>
+
+                    <!-- Link Columns -->
+                    <div>
+                        <h4 class="font-bold text-slate-900 dark:text-white">Contact</h4>
+                        <ul class="mt-4 space-y-2">
+                            <li><a href="#" class="footer-link">About Us</a></li>
+                            <li><a href="#" class="footer-link">Support</a></li>
+                            <li><a href="#" class="footer-link">Careers</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-slate-900 dark:text-white">Help</h4>
+                        <ul class="mt-4 space-y-2">
+                            <li><a href="#" class="footer-link">FAQ</a></li>
+                            <li><a href="#" class="footer-link">Booking Guide</a></li>
+                            <li><a href="#" class="footer-link">Cancellation</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-slate-900 dark:text-white">Company</h4>
+                        <ul class="mt-4 space-y-2">
+                            <li><a href="#" class="footer-link">Our Team</a></li>
+                            <li><a href="#" class="footer-link">Blog</a></li>
+                            <li><a href="#" class="footer-link">Partners</a></li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-slate-900 dark:text-white">Social Media</h4>
+                        <ul class="mt-4 space-y-2">
+                            <li><a href="#" class="footer-link">Facebook</a></li>
+                            <li><a href="#" class="footer-link">Instagram</a></li>
+                            <li><a href="#" class="footer-link">Twitter (X)</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div
+                    class="mt-12 pt-8 border-t border-slate-200 dark:border-slate-800 text-center text-sm text-slate-500 dark:text-slate-400">
+                    &copy; 2025 Stay. All rights reserved. Sliced by an expert.
+                </div>
+            </div>
+        </footer>
+
+        <!-- 
+      Global Modals
+      ----------------
+      "Watch Video" Modal
+    -->
+        <div x-show="videoModalOpen" class="fixed inset-0 z-99 flex items-center justify-center p-4" x-cloak>
+            <!-- Modal Overlay -->
+            <div x-show="videoModalOpen" x-transition:enter="fade-enter-active"
+                x-transition:enter-start="fade-enter-from" x-transition:enter-end="fade-leave-to"
+                x-transition:leave="fade-leave-active" x-transition:leave-start="fade-enter-end"
+                x-transition:leave-end="fade-leave-from" @click="videoModalOpen = false"
+                class="absolute inset-0 bg-black/70 backdrop-blur-xs"></div>
+
+            <!-- Modal Content -->
+            <div x-show="videoModalOpen" x-transition @click.outside="videoModalOpen = false"
+                class="relative w-full max-w-3xl bg-white dark:bg-brand-dark-light rounded-xl shadow-2xl overflow-hidden">
+                <!-- Aspect Ratio Box -->
+                <div class="aspect-w-16 aspect-h-9">
+                    <!-- Replace with your video embed -->
+                    <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen class="w-full h-full"></iframe>
+                </div>
+
+                <!-- Close Button -->
+                <button @click="videoModalOpen = false"
+                    class="absolute top-2 right-2 p-2 rounded-full bg-black/20 text-white hover:bg-black/50 transition-colors"
+                    aria-label="Close video modal">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+    </div> <!-- End App-level Alpine.js data store -->
+
+</body>
+
+</html>
